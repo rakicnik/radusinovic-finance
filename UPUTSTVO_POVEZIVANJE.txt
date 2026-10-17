@@ -1,0 +1,62 @@
+RADUSINOVIĆ FINANCE — POVEZIVANJE NETLIFY + GOOGLE SHEETS
+========================================================
+Paket je pripremljen iz prethodno poslanog projekta Netlify_PROJEKAT_ZA_AUTOMATIKU.zip.
+Ne sadrži stvarne fakture, uplate, predmete niti pristupne lozinke.
+
+ŠTA JE VEĆ NAPRAVLJENO
+- public/index.html: izgled dashboarda, ekran za prijavu, klijenti/fakture/prilivi/predmeti.
+- public/netlify-auth.js: pozivi prema Netlify serveru, bez otkrivanja tajni.
+- netlify/functions/api.js: serverska funkcija za prijavu i komunikaciju sa Apps Scriptom.
+- netlify.toml: objavljivanje iz mape public i Netlify Functions iz netlify/functions.
+- .env.example: NAZIVI 4 potrebne Netlify varijable (bez vrijednosti).
+
+VAŽNO: DRAG & DROP ZIP-a NE OBJAVLJUJE POUZDANO NETLIFY FUNCTIONS.
+Da biste imali zajedničku bazu na više računara, potrebno je Netlify Git deployment
+(ili Netlify CLI), ne samo ručno postavljanje statičkog sajta.
+
+POSTUPAK (NEMOJTE UNAPRIJED OTVARATI PODATKE SVIMA)
+1) Raspakujte ZIP u folder na računaru (npr. Radusinovic_Finance_Povezivanje).
+2) Napravite PRIVATAN GitHub repozitorij i učitajte sadržaj foldera, uključujući
+   public/, netlify/, netlify.toml, .gitignore i .env.example. Nemojte dodavati PDF,
+   XLSX, korisničke podatke, .env ili bilo koji tajni ključ.
+3) U Netlify za postojeći projekat povežite Git repozitorij (Project configuration
+   / Build & deploy / Continuous deployment — Connect repository, raspored menija varira).
+   Objavljivanje mora prikazati 1 serverless function: api.
+4) U Apps Script > Project Settings > Script properties kreirajte RAD_BRIDGE_TOKEN
+   sa nasumičnom tajnom od najmanje 32 znaka. VRIJEDNOST NE SLATI U CHAT.
+5) U Apps Script > Deploy > Manage deployments > Edit (novo izdanje) Web app:
+     Execute as: Me
+     Who has access: Anyone
+   VAŽNO: To omogućava serveru pozivanje /exec URL-a, ali kod mora provjeravati
+   RAD_BRIDGE_TOKEN i ne smije vraćati podatke bez podudarnog tokena. Bez koraka 4
+   JAVNA APLIKACIJA NE SMIJE BITI PODEŠENA NA ANYONE.
+   Sačuvajte punu Web app URL adresu (.../exec), ne Deployment ID.
+6) Netlify > Project configuration > Environment variables postavite:
+     GOOGLE_SCRIPT_WEBAPP_URL = pun Apps Script /exec URL
+     GOOGLE_SCRIPT_BRIDGE_TOKEN = ista tajna kao Apps Script RAD_BRIDGE_TOKEN
+     NETLIFY_SESSION_SECRET = druga nasumična tajna, >=32 znaka
+     DASHBOARD_PASSWORD = vaša snažna zasebna lozinka, >=14 znakova
+   OVE VRIJEDNOSTI NEMOJTE SLATI U CHAT. Podrška Netlify Functions scope obavezna.
+7) Pokrenite novi production Git deploy da se varijable učitaju.
+8) Na oba računara otvorite isti https://...netlify.app URL, prijavite se lozinkom
+   i kliknite 'Učitaj najnovije'. Treba pisati 'Google Sheets aktivan'.
+9) Provjerite broj faktura, uplata i predmeta. Provjerite prikaz novog zapisa na
+   oba računara prije oslanjanja na ažurnost podataka.
+
+DIJAGNOSTIKA
+- Ako nema prijave ili se javlja poruka o neaktivnom API-ju, nije objavljena
+  serverless funkcija: provjerite Git deploy i pregled Functions u Netlify.
+- 'Nedostaje konfiguracija servera': provjerite četiri environment varijable.
+- 'Google nije vratio JSON': Web app je još 'Only myself', pogrešan /exec URL,
+  ili Google nije dopustio poziv iz Netlifyja.
+- 'Neovlašćen zahtjev': RAD_BRIDGE_TOKEN nije jednak GOOGLE_SCRIPT_BRIDGE_TOKEN.
+- Samo 'Execution completed' za syncGmail ne garantuje da su PDF-ovi knjiženi.
+- Nikada ne brišite kartice Google Sheetsa radi popravke Netlify prikaza.
+
+OGRANIČENJA
+Ovaj paket je pripremljen i strukturno provjeren lokalno. Nije objavljen
+u vašem Netlify nalogu niti testiran protiv vašeg stvarnog Apps Script URL-a.
+Zaštita od otvorenog pristupa putem Google-ove opcije 'Anyone' ovdje se zasniva
+na tajnom serverskom tokenu; ovo ne znači da bilo koji javni URL treba držati
+bez autorizacije. Za profesionalnu upotrebu razmotrite korisničke naloge, 2FA,
+reviziju pristupa i dodatne serverske kontrole.
